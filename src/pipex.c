@@ -53,36 +53,34 @@ char *get_command_path(char *cmd)
     return NULL ; 
 }
 
-int main(int argc , char **argv)
+void child_process(char **argv)
 {
     char *file_content;
     char *cmd_path;
-    char *argv_cmd[3] ; 
+    char *argv_cmd[3]; 
 
-    argv_cmd[0] = "ls" ; 
-    argv_cmd[1] = "-l" ; 
-    argv_cmd[2] = NULL ; 
-   
+    argv_cmd[0] = "ls";
+    argv_cmd[1] = "-l";
+    argv_cmd[2] = NULL;
+    file_content = read_file_content(argv[1]);
+    cmd_path = get_command_path("/ls");
+    execve(cmd_path ,  argv_cmd , NULL);
+}
+
+int main(int argc , char **argv)
+{
+    pid_t child_pid;
 
     if (argc < 5 )
     {
         perror("expected : input_file cmd1 | cmd2 output_file");
         return 0;
     }
-    file_content = read_file_content(argv[1]);
-    free(file_content);
-    cmd_path = get_command_path("/ls");
-    execve(cmd_path ,  argv_cmd , NULL ) ; 
-
-    ft_printf("here") ; 
-     ft_printf("here") ; 
-      ft_printf("here") ; 
-       ft_printf("here\n") ; 
-        ft_printf("here") ; 
-         ft_printf("here") ; 
-          ft_printf("here") ; 
-           ft_printf("here") ; 
-            ft_printf("here") ; 
-
-             ft_printf("here") ; 
+    child_pid  = fork();
+    if (child_pid)
+    {
+        waitpid(child_pid , NULL , 0 );
+        return 0 ; 
+    }
+    child_process(argv);
 }
