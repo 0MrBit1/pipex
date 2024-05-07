@@ -56,12 +56,13 @@ void child_of_child(char **argv , int pipe_write)
 {
     int fd;
     char *cmd_path; 
+    char *arr[] = {"sleep" , "4", NULL} ; 
 
     fd = open(argv[1] , O_RDONLY);
     dup2(fd , 0);
     dup2(pipe_write ,1 );
-    cmd_path = get_command_path("/cat");
-    execve(cmd_path ,  NULL , NULL);
+    cmd_path = get_command_path("/sleep");
+    execve(cmd_path , arr , NULL);
 }
 
 void child_process(char **argv , int pipe_write)
@@ -70,19 +71,20 @@ void child_process(char **argv , int pipe_write)
     char    *cmd_path;
     int     child_pid;
     int     pipefd[2];
+    char *arr[] = {"sleep" , "2" , NULL} ; 
     
-    child_pid = fork();
     pipe(pipefd);
+    fd = open(argv[2] , O_WRONLY);
+    child_pid = fork();
     if (child_pid)
     {
-        waitpid(child_pid , NULL , 0);
-
-        fd = open(argv[1] , O_RDONLY);
-        dup2(fd , 0);
-        dup2(pipe_write ,1 );
-        cmd_path = get_command_path("/cat");
-        execve(cmd_path ,  NULL , NULL);
+        close(pipefd[1]);
+        dup2(pipefd[0], 0);
+        dup2(fd , 1);
+        cmd_path = get_command_path("/sleep");
+        execve(cmd_path ,  arr , NULL);
     }
+    close(pipefd[0]);
    child_of_child(argv , pipefd[1]);
 }
 
@@ -90,12 +92,14 @@ int main(int argc , char **argv)
 {
     pid_t child_pid;
     int pipefd[2] ; 
-    
-    child_pid  = fork();
+   
     pipe(pipefd);
+    child_pid  = fork();
     if (child_pid)
     {
-        waitpid(child_pid , NULL , 0);
+        while (wait(NULL) == -1)
+            ;
+        close(pipefd[0]);
         return 0;
     }
     child_process(argv , pipefd[1]);
