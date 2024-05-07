@@ -2,7 +2,7 @@ NAME = pipex
 SRCDIR = ./src
 SOURCES = $(SRCDIR)/pipex.c
 OBJECTS = $(SOURCES:.c=.o)
-CFLAGS = -Wall -Wextra  -fsanitize=leak
+CFLAGS = -Wall -Wextra -fsanitize=leak
 LIBDIR = ./lib
 LIBS = -L$(LIBDIR) -lft -lftprintf -fsanitize=leak
 

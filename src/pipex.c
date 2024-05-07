@@ -15,7 +15,7 @@ char *read_file_content(char *file_path)
     while(line)
     {
         to_free = file_content;
-        file_content = ft_strjoin(file_content , line) ; 
+        file_content = ft_strjoin(file_content , line); 
         free(to_free);
         free(line);
         line = get_next_line(fd);
@@ -25,7 +25,6 @@ char *read_file_content(char *file_path)
 
 char *get_command_path(char *cmd)
 {
-
     char    *PATH_VARIABLE;
     int     i;
     int     start;
@@ -50,37 +49,55 @@ char *get_command_path(char *cmd)
         }
         i++;
     }
-    return NULL ; 
+    return NULL;
 }
 
-void child_process(char **argv)
+void child_of_child(char **argv , int pipe_write)
 {
-    char *file_content;
-    char *cmd_path;
-    char *argv_cmd[3]; 
+    int fd;
+    char *cmd_path; 
 
-    argv_cmd[0] = "ls";
-    argv_cmd[1] = "-l";
-    argv_cmd[2] = NULL;
-    file_content = read_file_content(argv[1]);
-    cmd_path = get_command_path("/ls");
-    execve(cmd_path ,  argv_cmd , NULL);
+    fd = open(argv[1] , O_RDONLY);
+    dup2(fd , 0);
+    dup2(pipe_write ,1 );
+    cmd_path = get_command_path("/cat");
+    execve(cmd_path ,  NULL , NULL);
+}
+
+void child_process(char **argv , int pipe_write)
+{
+    int     fd;
+    char    *cmd_path;
+    int     child_pid;
+    int     pipefd[2];
+    
+    child_pid = fork();
+    pipe(pipefd);
+    if (child_pid)
+    {
+        waitpid(child_pid , NULL , 0);
+
+        fd = open(argv[1] , O_RDONLY);
+        dup2(fd , 0);
+        dup2(pipe_write ,1 );
+        cmd_path = get_command_path("/cat");
+        execve(cmd_path ,  NULL , NULL);
+    }
+   child_of_child(argv , pipefd[1]);
 }
 
 int main(int argc , char **argv)
 {
     pid_t child_pid;
-
-    if (argc < 5 )
-    {
-        perror("expected : input_file cmd1 | cmd2 output_file");
-        return 0;
-    }
+    int pipefd[2] ; 
+    
     child_pid  = fork();
+    pipe(pipefd);
     if (child_pid)
     {
-        waitpid(child_pid , NULL , 0 );
-        return 0 ; 
+        waitpid(child_pid , NULL , 0);
+        return 0;
     }
-    child_process(argv);
+    child_process(argv , pipefd[1]);
 }
+
