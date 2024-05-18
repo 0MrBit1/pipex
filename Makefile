@@ -1,10 +1,10 @@
 NAME = pipex
 SRCDIR = ./src
-SOURCES = $(SRCDIR)/pipex.c
+SOURCES = $(SRCDIR)/pipex.c $(SRCDIR)/pipex_utils.c
 OBJECTS = $(SOURCES:.c=.o)
-CFLAGS = -Wall -Wextra -fsanitize=leak
+CFLAGS = -Wall -Wextra 
 LIBDIR = ./lib
-LIBS = -L$(LIBDIR) -lft -lftprintf -fsanitize=leak
+LIBS = -L$(LIBDIR) -lft -lftprintf 
 
 all: $(NAME)
 

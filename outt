@@ -1,0 +1,13 @@
+total 32
+drwxr-xr-x. 1 abdo1 abdo1    96 May 15 19:08 .
+drwxr-xr-x. 1 abdo1 abdo1    70 May  4 17:25 ..
+drwxr-xr-x. 1 abdo1 abdo1   144 May  7 14:18 .git
+drwxr-xr-x. 1 abdo1 abdo1    26 May 10 01:10 .vscode
+-rw-r--r--. 1 abdo1 abdo1   397 May 15 18:52 Makefile
+drwxr-xr-x. 1 abdo1 abdo1     0 Mar 22 19:30 bin
+drwxr-xr-x. 1 abdo1 abdo1    50 Mar 24 13:11 include
+drwxr-xr-x. 1 abdo1 abdo1    40 Mar 24 13:04 lib
+-rw-r--r--. 1 abdo1 abdo1    63 May 15 19:07 outt
+-rwxr-xr-x. 1 abdo1 abdo1 17624 May 15 19:08 pipex
+drwxr-xr-x. 1 abdo1 abdo1   118 May 15 19:08 src
+-rw-r--r--. 1 abdo1 abdo1    58 Mar 24 13:09 test
