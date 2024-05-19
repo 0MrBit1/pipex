@@ -1,17 +1,31 @@
 #include "../include/pipex.h"
 
-int child_process()
+void child_process1(char **argv , char **envp , int pipe_write)
 {
+    int i;
+    char *cmd;
 
+    i = 0 ; 
+    while(envp[i])
+    {
+        if (!  ft_strncmp(envp[i] ,  "PATH=" , 5 ) )
+        {
+            cmd = get_command_path(char *cmd , envp[i] + 5) ;
+        }
 
+    }
 
-
-    
 }
 
-int main(int argc , char **argv  )
+void child_process2(char **argv , char **envp  , int pipe_write)
 {
-    pid_t   child_pid;
+
+
+}
+
+int main(int argc , char **argv , char *envp )
+{
+    pid_t   pid;
     int     pipefd[2]; 
 
     if (pipe(pipefd) < 0 )
@@ -19,11 +33,14 @@ int main(int argc , char **argv  )
         perror("There was an error creating the pipe , please try again.\n"); 
         return 1;
     }
-    child_pid  = fork();
-    if (child_pid)
+    pid = fork();
+    if (pid == 0)
     {
-        close(pipefd[0]);
-        return (0);
+        child_process1( argv , pipefd[1] ) ;
     }
-    child_process(argv , pipefd[1]);
+    pid = fork() ; 
+    if (pid == 0)
+    {
+        child_process2(argv , pipefd[1] ) ;
+    }
 }
