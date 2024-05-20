@@ -1,13 +1,95 @@
-total 32
-drwxr-xr-x. 1 abdo1 abdo1    96 May 15 19:08 .
-drwxr-xr-x. 1 abdo1 abdo1    70 May  4 17:25 ..
-drwxr-xr-x. 1 abdo1 abdo1   144 May  7 14:18 .git
-drwxr-xr-x. 1 abdo1 abdo1    26 May 10 01:10 .vscode
--rw-r--r--. 1 abdo1 abdo1   397 May 15 18:52 Makefile
-drwxr-xr-x. 1 abdo1 abdo1     0 Mar 22 19:30 bin
-drwxr-xr-x. 1 abdo1 abdo1    50 Mar 24 13:11 include
-drwxr-xr-x. 1 abdo1 abdo1    40 Mar 24 13:04 lib
--rw-r--r--. 1 abdo1 abdo1    63 May 15 19:07 outt
--rwxr-xr-x. 1 abdo1 abdo1 17624 May 15 19:08 pipex
-drwxr-xr-x. 1 abdo1 abdo1   118 May 15 19:08 src
--rw-r--r--. 1 abdo1 abdo1    58 Mar 24 13:09 test
+#include "../include/pipex.h"
+
+void child_process1(char **argv , char **envp  , int pipe_write )
+{
+    int     i;
+    char    *cmd;
+    char    **args;
+    int     fd; 
+
+    i = 0;
+    args = ft_split(argv[2] , ' ');
+    fd = open(argv[1] , O_RDONLY, 0666) ; 
+    if (fd < 0)
+    { 
+        perror("error: \n");
+        
+    }
+    while(envp[i])
+    {
+        if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
+            cmd = get_command_path(args[0] , envp[i] + 5);
+        i++;
+    }
+    if ( dup2(fd , 0) < 0 )
+    {
+        perror("error: \n");
+    } 
+    if (dup2(pipe_write , 1) < 0)
+    {
+        perror("error: \n");
+    }
+    execve(cmd , args , envp);
+    perror ("error exece cmd1 \n");
+    exit(1);
+}
+
+void child_process2(char **argv , char **envp  , int pipe_read )
+{
+
+    int     i;
+    char    *cmd;
+    char    **args;
+    int     fd;
+
+    i = 0;
+    args = ft_split(argv[3] , ' ');
+    fd = open(argv[4] , O_WRONLY | O_CREAT | O_TRUNC, 0666) ;
+    if (fd < 0)
+        perror("error : \n");
+    while(envp[i])
+    {
+        if (! ft_strncmp( envp[i], "PATH=" , 5 ))
+        {
+            cmd = get_command_path(args[0], envp[i] + 5);
+        }
+        i++;
+    }
+    if (dup2(fd , 1) < 0 )
+        perror("error: \n");
+    if (dup2(pipe_read , 0) < 0  )
+        perror("error: \n");
+    execve(cmd, args , envp);
+    perror ("error exece cmd2 \n");
+    exit (1);
+}
+
+int main(int argc , char **argv , char **envp )
+{
+    pid_t   pid;
+    int     pipefd[2]; 
+
+    (void)argc;
+    if (pipe(pipefd) < 0 )
+    {
+        perror("There was an error creating the pipe ,please try again.\n"); 
+        return 1;
+    }
+    if ((pid = fork()) < 0)
+        printf ("error \n");
+    if (pid == 0)
+    {
+        close(pipefd[0]); 
+        child_process1(argv , envp , pipefd[1]); 
+    }
+    if ((pid = fork()) < 0)
+        printf ("error \n"); 
+    if (pid == 0)
+    {
+        close(pipefd[1] );
+        child_process2(argv , envp  , pipefd[0] );
+    }
+    close(pipefd[0]);
+    close(pipefd[1]); 
+    while(wait(NULL) != -1) ;
+}
