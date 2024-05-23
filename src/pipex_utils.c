@@ -10,6 +10,8 @@ char *get_command_path(char *cmd , char *PATH_VARIABLE)
 
     i = 0;
     start = 0;
+    if (!access(cmd , X_OK))
+        return cmd ;
     cmd = ft_strjoin("/" , cmd) ; 
     while(PATH_VARIABLE[i])
     {   
