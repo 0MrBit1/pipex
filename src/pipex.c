@@ -1,5 +1,24 @@
 #include "../include/pipex.h"
 
+
+
+
+void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
+{
+
+    if ( dup2(fd , fd_dup) < 0 )
+    {
+        perror("error: \n");
+        exit(1);
+    } 
+    if (dup2(pipefd , pipe_dup) < 0 )
+    {
+        perror("error: \n");
+        exit(1);
+    }
+
+
+}
 void child_process1(char **argv , char **envp  , int *pipefd )
 {
     int     i;
@@ -16,22 +35,14 @@ void child_process1(char **argv , char **envp  , int *pipefd )
         perror("error: \n");
         exit(1);
     }
+    dup_fds(fd ,  pipefd[1] , 0 , 1);
     while(envp[i])
     {
         if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
             cmd = get_command_path(args[0] , envp[i] + 5);
         i++;
     }
-    if ( dup2(fd , 0) < 0 )
-    {
-        perror("error: \n");
-        exit(1);
-    } 
-    if (dup2(pipefd[1] , 1) < 0 )
-    {
-        perror("error: \n");
-        exit(1);
-    }
+
     execve(cmd , args , envp);
     perror ("error exece cmd1 \n");
     exit(1);
@@ -56,10 +67,7 @@ void child_process2(char **argv , char **envp  , int *pipefd )
             cmd = get_command_path(args[0], envp[i] + 5);
         i++;
     }
-    if (dup2(fd , 1) < 0 )
-        perror("error: \n");
-    if (dup2(pipefd[0] , 0) < 0  )
-        perror("error: \n");
+    dup_fds(fd ,  pipefd[0] , 1 , 0);
     execve(cmd, args , envp);
     perror ("error exece cmd2 \n");
     exit (1);
