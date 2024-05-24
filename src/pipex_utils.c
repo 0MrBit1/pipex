@@ -1,17 +1,10 @@
 #include "../include/pipex.h"
 
-char *get_command_path(char *cmd , char *PATH_VARIABLE)
+char *cmd_helper(char *cmd , char *PATH_VARIABLE , int start , int i )
 {
-    int     i;
-    int     start;
     char    *cmd_path;
     char    *potencial_path;
 
-    i = 0;
-    start = 0;
-    if (!access(cmd , X_OK))
-        return cmd ;
-    cmd = ft_strjoin("/" , cmd) ; 
     while(PATH_VARIABLE[i])
     {   
         if (PATH_VARIABLE[i] == ':')
@@ -30,8 +23,19 @@ char *get_command_path(char *cmd , char *PATH_VARIABLE)
         }
         i++;
     }
-    free(cmd);
-    return NULL;
+    return NULL ;
+}
+
+char *get_command_path(char *cmd , char *PATH_VARIABLE)
+{
+
+    char    *cmd_path;
+
+    if (!access(cmd , X_OK))
+        return cmd ;
+    cmd = ft_strjoin("/" , cmd) ; 
+    cmd_path = cmd_helper(cmd , PATH_VARIABLE , 0 , 0 ) ; 
+    return cmd_path;
 }
 
 void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
