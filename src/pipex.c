@@ -9,14 +9,13 @@ void child_process1(char **argv , char **envp  , int *pipefd )
     close(pipefd[0]);
 
     args = ft_split(argv[2] , ' ');
-    fd = open(argv[1] , O_RDONLY) ; 
+    fd = open(argv[1] , O_RDONLY); 
     if (fd < 0)
     { 
         perror("error: \n");
         exit(1);
     }
     dup_fds(fd ,  pipefd[1] , 0 , 1);
- 
     cmd =  return_command(args , envp);
     execve(cmd , args , envp);
     perror ("error exece cmd1 \n");
@@ -52,15 +51,15 @@ void parent_process(int *pipefd , char **argv , char **envp )
         pid = fork() ;
         if (pid < 0)
         {
-            perror("failed to fork child process\n");
+            perror("Failed to fork child process\n");
             exit(1);
         }
         if (pid == 0)
         {
             if (i == 0)
-                child_process1(argv , envp , pipefd);
+                child_process1(argv , envp ,pipefd);
             else if (i == 1)
-                child_process2(argv , envp  , pipefd );
+                child_process2(argv , envp  ,pipefd);
         }
         i++ ; 
     }

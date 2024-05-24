@@ -25,19 +25,16 @@ char *cmd_helper(char *cmd , char *PATH_VARIABLE , int start , int i )
     }
     return NULL ;
 }
-
 char *get_command_path(char *cmd , char *PATH_VARIABLE)
 {
-
     char    *cmd_path;
 
     if (!access(cmd , X_OK))
-        return cmd ;
-    cmd = ft_strjoin("/" , cmd) ; 
-    cmd_path = cmd_helper(cmd , PATH_VARIABLE , 0 , 0 ) ; 
+        return cmd;
+    cmd = ft_strjoin("/" , cmd); 
+    cmd_path = cmd_helper(cmd , PATH_VARIABLE , 0 , 0 ); 
     return cmd_path;
 }
-
 void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
 {
     if (dup2(fd , fd_dup) < 0 )
@@ -62,15 +59,13 @@ char *return_command(char **args , char **envp)
             return get_command_path(args[0] , envp[i] + 5);
         i++;
     }
-
     return NULL;
 }
 void error_handler(int argc , int *pipefd)
 {
-
     if (argc != 5)
     {
-        perror("Please entre the arguments properly\n");
+        perror("Please follow this format : in_file cmd1 cmd2 out_file\n");
         exit(1);
     }
     if ( pipe(pipefd) < 0 )
