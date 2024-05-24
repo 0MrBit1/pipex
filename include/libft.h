@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abdo1 <abdo1@student.42.fr>                +#+  +:+       +#+        */
+/*   By: acharik <acharik@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/24 13:14:36 by acharik           #+#    #+#             */
-/*   Updated: 2024/03/24 13:13:00 by abdo1            ###   ########.fr       */
+/*   Updated: 2024/05/24 23:25:53 by acharik          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
-#define BUFFER_SIZE 42
+# define BUFFER_SIZE 42
+# include <fcntl.h>
+# include <limits.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-#include <limits.h>
-#include <fcntl.h>
-#include <stdio.h> 
 
 typedef struct s_list
 {
