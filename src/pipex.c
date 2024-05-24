@@ -1,12 +1,9 @@
 #include "../include/pipex.h"
 
 
-
-
 void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
 {
-
-    if ( dup2(fd , fd_dup) < 0 )
+    if (dup2(fd , fd_dup) < 0 )
     {
         perror("error: \n");
         exit(1);
@@ -16,18 +13,30 @@ void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
         perror("error: \n");
         exit(1);
     }
+}
 
+char *return_command(char **args , char **envp)
+{
+    int i ;
 
+    i = 0;
+    while(envp[i])
+    {
+        if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
+            return get_command_path(args[0] , envp[i] + 5);
+        i++;
+    }
+
+    return NULL;
 }
 void child_process1(char **argv , char **envp  , int *pipefd )
 {
-    int     i;
     char    *cmd;
     char    **args;
     int     fd; 
 
     close(pipefd[0]);
-    i = 0;
+
     args = ft_split(argv[2] , ' ');
     fd = open(argv[1] , O_RDONLY) ; 
     if (fd < 0)
@@ -36,13 +45,8 @@ void child_process1(char **argv , char **envp  , int *pipefd )
         exit(1);
     }
     dup_fds(fd ,  pipefd[1] , 0 , 1);
-    while(envp[i])
-    {
-        if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
-            cmd = get_command_path(args[0] , envp[i] + 5);
-        i++;
-    }
-
+ 
+    cmd =  return_command(args , envp);
     execve(cmd , args , envp);
     perror ("error exece cmd1 \n");
     exit(1);
@@ -61,12 +65,7 @@ void child_process2(char **argv , char **envp  , int *pipefd )
     fd = open(argv[4] , O_WRONLY | O_CREAT | O_TRUNC, 0666) ;
     if (fd < 0)
         perror("error : \n");
-    while(envp[i])
-    {
-        if (! ft_strncmp( envp[i], "PATH=" , 5 ))
-            cmd = get_command_path(args[0], envp[i] + 5);
-        i++;
-    }
+    cmd = return_command(args , envp);
     dup_fds(fd ,  pipefd[0] , 1 , 0);
     execve(cmd, args , envp);
     perror ("error exece cmd2 \n");
