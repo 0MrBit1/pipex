@@ -1,34 +1,5 @@
 #include "../include/pipex.h"
 
-
-void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
-{
-    if (dup2(fd , fd_dup) < 0 )
-    {
-        perror("error: \n");
-        exit(1);
-    } 
-    if (dup2(pipefd , pipe_dup) < 0 )
-    {
-        perror("error: \n");
-        exit(1);
-    }
-}
-
-char *return_command(char **args , char **envp)
-{
-    int i ;
-
-    i = 0;
-    while(envp[i])
-    {
-        if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
-            return get_command_path(args[0] , envp[i] + 5);
-        i++;
-    }
-
-    return NULL;
-}
 void child_process1(char **argv , char **envp  , int *pipefd )
 {
     char    *cmd;
@@ -51,7 +22,6 @@ void child_process1(char **argv , char **envp  , int *pipefd )
     perror ("error exece cmd1 \n");
     exit(1);
 }
-
 void child_process2(char **argv , char **envp  , int *pipefd )
 {
     int     i;
@@ -70,22 +40,6 @@ void child_process2(char **argv , char **envp  , int *pipefd )
     execve(cmd, args , envp);
     perror ("error exece cmd2 \n");
     exit (1);
-}
-
-void error_handler(int argc , int *pipefd)
-{
-
-    if (argc != 5)
-    {
-        perror("Please entre the arguments properly\n");
-        exit(1);
-    }
-    if ( pipe(pipefd) < 0 )
-    {
-        perror("There was an error creating the pipe\n"); 
-        exit(1);
-    }
-
 }
 void parent_process(int *pipefd , char **argv , char **envp )
 {
@@ -119,7 +73,6 @@ int main(int argc , char **argv , char **envp )
 {
     int     pipefd[2];
    
-
     error_handler(argc , pipefd) ;
     parent_process(pipefd , argv , envp );
 }

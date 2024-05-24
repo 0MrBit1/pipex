@@ -1,6 +1,5 @@
 #include "../include/pipex.h"
 
-
 char *get_command_path(char *cmd , char *PATH_VARIABLE)
 {
     int     i;
@@ -33,4 +32,46 @@ char *get_command_path(char *cmd , char *PATH_VARIABLE)
     }
     free(cmd);
     return NULL;
+}
+
+void dup_fds(int fd ,  int pipefd , int fd_dup , int pipe_dup )
+{
+    if (dup2(fd , fd_dup) < 0 )
+    {
+        perror("error: \n");
+        exit(1);
+    } 
+    if (dup2(pipefd , pipe_dup) < 0 )
+    {
+        perror("error: \n");
+        exit(1);
+    }
+}
+char *return_command(char **args , char **envp)
+{
+    int i ;
+
+    i = 0;
+    while(envp[i])
+    {
+        if (!  ft_strncmp( envp[i], "PATH=" , 5 ))
+            return get_command_path(args[0] , envp[i] + 5);
+        i++;
+    }
+
+    return NULL;
+}
+void error_handler(int argc , int *pipefd)
+{
+
+    if (argc != 5)
+    {
+        perror("Please entre the arguments properly\n");
+        exit(1);
+    }
+    if ( pipe(pipefd) < 0 )
+    {
+        perror("There was an error creating the pipe\n"); 
+        exit(1);
+    }
 }
