@@ -1,12 +1,13 @@
 #include "../include/pipex.h"
 
-void child_process1(char **argv , char **envp  , int pipe_write )
+void child_process1(char **argv , char **envp  , int *pipefd )
 {
     int     i;
     char    *cmd;
     char    **args;
     int     fd; 
 
+    close(pipefd[0]);
     i = 0;
     args = ft_split(argv[2] , ' ');
     fd = open(argv[1] , O_RDONLY) ; 
@@ -24,23 +25,26 @@ void child_process1(char **argv , char **envp  , int pipe_write )
     if ( dup2(fd , 0) < 0 )
     {
         perror("error: \n");
+        exit(1);
     } 
-    if (dup2(pipe_write , 1) < 0 )
+    if (dup2(pipefd[1] , 1) < 0 )
     {
         perror("error: \n");
+        exit(1);
     }
     execve(cmd , args , envp);
     perror ("error exece cmd1 \n");
     exit(1);
 }
 
-void child_process2(char **argv , char **envp  , int pipe_read )
+void child_process2(char **argv , char **envp  , int *pipefd )
 {
     int     i;
     char    *cmd;
     char    **args;
     int     fd;
 
+    close(pipefd[1]);
     i = 0;
     args = ft_split(argv[3] , ' ');
     fd = open(argv[4] , O_WRONLY | O_CREAT | O_TRUNC, 0666) ;
@@ -54,7 +58,7 @@ void child_process2(char **argv , char **envp  , int pipe_read )
     }
     if (dup2(fd , 1) < 0 )
         perror("error: \n");
-    if (dup2(pipe_read , 0) < 0  )
+    if (dup2(pipefd[0] , 0) < 0  )
         perror("error: \n");
     execve(cmd, args , envp);
     perror ("error exece cmd2 \n");
@@ -76,34 +80,39 @@ void error_handler(int argc , int *pipefd)
     }
 
 }
-
-int main(int argc , char **argv , char **envp )
+void parent_process(int *pipefd , char **argv , char **envp )
 {
+    int i;
     pid_t   pid;
-    int     pipefd[2];
 
-    error_handler(argc , pipefd ) ; 
-    if ((pid = fork()) < 0)
+    i = 0;
+    while ( i < 2)
     {
-        perror("failed to fork child process\n");
-        exit(1);
-    }
-    if (pid == 0)
-    {
-        close(pipefd[0]); 
-        child_process1(argv , envp , pipefd[1]);
-    }
-    if ((pid = fork()) < 0)
-    {
-        printf ("error \n"); 
-        exit(1);
-    }
-    if (pid == 0)
-    {
-        close(pipefd[1] );
-        child_process2(argv , envp  , pipefd[0] );
+        pid = fork() ;
+        if (pid < 0)
+        {
+            perror("failed to fork child process\n");
+            exit(1);
+        }
+        if (pid == 0)
+        {
+            if (i == 0)
+                child_process1(argv , envp , pipefd);
+            else if (i == 1)
+                child_process2(argv , envp  , pipefd );
+        }
+        i++ ; 
     }
     close(pipefd[0]);
     close(pipefd[1]); 
-    while(wait(NULL) != -1) ;
+    while(wait(NULL) != -1);
+}
+
+int main(int argc , char **argv , char **envp )
+{
+    int     pipefd[2];
+   
+
+    error_handler(argc , pipefd) ;
+    parent_process(pipefd , argv , envp );
 }
