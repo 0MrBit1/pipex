@@ -6,11 +6,24 @@
 /*   By: acharik <acharik@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 22:34:40 by acharik           #+#    #+#             */
-/*   Updated: 2024/05/24 22:37:12 by acharik          ###   ########.fr       */
+/*   Updated: 2024/05/24 23:32:16 by acharik          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/pipex.h"
+
+void	free_array(char **array)
+{
+	int	i;
+
+	i = 0;
+	while (array[i])
+	{
+		free(array[i]);
+		i++;
+	}
+	free(array);
+}
 
 void	child_process1(char **argv, char **envp, int *pipefd)
 {
@@ -31,6 +44,7 @@ void	child_process1(char **argv, char **envp, int *pipefd)
 	execve(cmd, args, envp);
 	perror("error exece cmd1 \n");
 	free(cmd);
+	free_array(args);
 	exit(1);
 }
 
@@ -51,6 +65,7 @@ void	child_process2(char **argv, char **envp, int *pipefd)
 	dup_fds(fd, pipefd[0], 1, 0);
 	execve(cmd, args, envp);
 	free(cmd);
+	free_array(args);
 	perror("error exece cmd2 \n");
 	exit(1);
 }

@@ -1,7 +1,7 @@
 NAME = pipex
 SRCDIR = ./src
 SOURCES = $(SRCDIR)/pipex.c $(SRCDIR)/pipex_utils.c
-OBJECTS = $(SOURCES:.c=.o)
+OBJECTS = $(SRCDIR)/pipex.o $(SRCDIR)/pipex_utils.o
 CFLAGS = -Wall -Wextra 
 LIBDIR = ./lib
 LIBS = -L$(LIBDIR) -lft -lftprintf 
@@ -11,7 +11,10 @@ all: $(NAME)
 $(NAME): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJECTS) $(LIBS)
 
-$(SRCDIR)/%.o: $(SRCDIR)/%.c
+$(SRCDIR)/pipex.o: $(SRCDIR)/pipex.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SRCDIR)/pipex_utils.o: $(SRCDIR)/pipex_utils.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
@@ -21,5 +24,3 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
-
-
